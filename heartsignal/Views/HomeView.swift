@@ -1,9 +1,16 @@
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject var connectivity: PhoneConnectivityManager
+    @State private var statusCards: [StatusCard] = StatusCard.samples
+    @State private var showNotification: Bool = false
+    @State private var showWatchInfo: Bool = false
+
+    private var isWatchConnected: Bool { connectivity.isWatchReachable }
+
     var body: some View {
         VStack(spacing: 0) {
-            AppNavBar()
+            navigationBar
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     VStack(spacing: 18) {
@@ -28,8 +35,34 @@ struct HomeView: View {
         .background(Color.bg)
     }
 
+    // MARK: - 상단 네비게이션 바
+
+    private var navigationBar: some View {
+        AppNavBar {
+            HStack(spacing: 4) {
+                Button { showWatchInfo = true } label: {
+                    HSIconView(name: isWatchConnected ? .watchOn : .watchOff)
+                }
+                Button { showNotification = true } label: {
+                    HSIconView(name: .bellOff, color: Color.brown700)
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showNotification) {
+            NotificationView(isPresented: $showNotification)
+        }
+        .sheet(isPresented: $showWatchInfo) {
+            WatchInfoSheet(isPresented: $showWatchInfo, isConnected: isWatchConnected, heartRate: connectivity.watchHeartRate)
+                .presentationDetents([.height(280)])
+                .presentationCornerRadius(24)
+        }
+    }
+
+    // MARK: - 심장 상태 섹션
+
     private var heartStatusSection: some View {
         ZStack(alignment: .topLeading) {
+            // 배경: 이미지 자체 비율로 가로 꽉 채움
             Image("img_heart_status_bg")
                 .resizable()
                 .scaledToFit()
@@ -44,6 +77,7 @@ struct HomeView: View {
                 }
                 .padding(.top, 20)
 
+                // 글래스모피즘 카드 (343 fixed, 192 height)
                 HStack(spacing: 0) {
                     heartRateColumn(name: "나", bpm: "123", change: "+12%", avg: "123")
                     Rectangle()
@@ -103,6 +137,8 @@ struct HomeView: View {
         .frame(maxWidth: .infinity)
     }
 
+    // MARK: - 우리 상태는
+
     private var ourStatusSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("우리 상태는")
@@ -112,6 +148,8 @@ struct HomeView: View {
             HeartStatusCardSlider()
         }
     }
+
+    // MARK: - 나는 지금...
 
     private var currentStatusSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -129,13 +167,15 @@ struct HomeView: View {
             }
 
             VStack(spacing: 12) {
-                ForEach(StatusCard.samples) { card in
+                ForEach(statusCards) { card in
                     StatusCardRow(card: card)
                 }
             }
         }
     }
 }
+
+// MARK: - 상태 카드 모델
 
 struct StatusCard: Identifiable {
     let id = UUID()
@@ -146,9 +186,11 @@ struct StatusCard: Identifiable {
     static let samples: [StatusCard] = [
         .init(text: "너에게 가는 중", emoji: "💓", isActive: true),
         .init(text: "업무 중", emoji: "💻", isActive: false),
-        .init(text: "울동 중", emoji: "💪", isActive: false),
+        .init(text: "운동 중", emoji: "💪", isActive: false),
     ]
 }
+
+// MARK: - 상태 카드 행
 
 struct StatusCardRow: View {
     let card: StatusCard
@@ -171,6 +213,70 @@ struct StatusCardRow: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(card.isActive ? Color.main700 : Color(hex: "E0E0E0"), lineWidth: 1)
         )
+    }
+}
+
+// MARK: - 워치 연결 정보 시트
+
+struct WatchInfoSheet: View {
+    @Binding var isPresented: Bool
+    let isConnected: Bool
+    let heartRate: Double
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // 핸들
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.gray700)
+                .frame(width: 36, height: 4)
+                .padding(.top, 12)
+                .padding(.bottom, 20)
+
+            // 워치 아이콘 + 상태
+            HSIconView(
+                name: isConnected ? .watchOn : .watchOff,
+                size: 48
+            )
+            .padding(.bottom, 12)
+
+            Text(isConnected ? "Apple Watch 연결됨" : "Apple Watch 미연결")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(Color.brown700)
+                .padding(.bottom, 6)
+
+            Text(isConnected ? "워치와 정상적으로 연결되어 있습니다." : "워치가 페어링되어 있지 않거나\n앱이 설치되지 않았습니다.")
+                .font(.system(size: 13, weight: .regular))
+                .foregroundColor(Color.gray900)
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 20)
+
+            // 심박수 정보
+            HStack(spacing: 0) {
+                VStack(spacing: 4) {
+                    Text("현재 심박수")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundColor(Color.gray900)
+                    HStack(alignment: .lastTextBaseline, spacing: 2) {
+                        Text(heartRate > 0 ? "\(Int(heartRate))" : "--")
+                            .font(.system(size: 28, weight: .semibold))
+                            .foregroundColor(Color.brown700)
+                        Text("bpm")
+                            .font(.system(size: 12, weight: .regular))
+                            .foregroundColor(Color.gray900)
+                            .padding(.bottom, 3)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.vertical, 16)
+            .background(Color.gray500)
+            .cornerRadius(14)
+            .padding(.horizontal, 20)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color.white)
     }
 }
 
