@@ -9,11 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab: TabItem = .home
+    @State private var showSendSheet  = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            // 상단 safe area 흰색 고정
             Color.white.ignoresSafeArea(edges: .top)
 
+            // 탭 컨텐츠
             Group {
                 switch selectedTab {
                 case .home:
@@ -29,9 +32,17 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(edges: .bottom)
 
-            TabBar(selected: $selectedTab) {}
+            // 하단 탭바
+            TabBar(selected: $selectedTab) {
+                showSendSheet = true
+            }
         }
         .ignoresSafeArea(edges: .bottom)
+        .sheet(isPresented: $showSendSheet) {
+            Text("보내기")
+                .font(.system(size: 20, weight: .semibold))
+                .presentationDetents([.medium])
+        }
     }
 
     private func placeholderView(_ title: String, icon: String) -> some View {
