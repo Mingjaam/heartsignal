@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct heartsignalApp: App {
+    @StateObject private var connectivity = PhoneConnectivityManager.shared
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(connectivity)
         }
     }
 }
