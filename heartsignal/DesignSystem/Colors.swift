@@ -20,3 +20,9 @@ extension Color {
         self.init(red: r, green: g, blue: b)
     }
 }
+
+// MARK: - Semantic Colors
+extension Color {
+    static let danger = Color(hex: "FF3B30")
+    static let success = Color(hex: "34C759")
+}
