@@ -30,7 +30,7 @@ struct HeartCardSlide {
 struct HeartStatusCardSlider: View {
     @State private var currentIndex: Int = 0
     private let slides = HeartCardSlide.slides
-    private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
+    private let timer = Timer.publish(every: 4, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack(alignment: .bottom) {
