@@ -189,7 +189,7 @@ struct MyPageView: View {
     private static var initialRoute: MyPageRoute? {
 #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
-        if let index = arguments.firstIndex(of: "-figmaRoute"),
+        if let index = arguments.firstIndex(of: "-figmaMyPageRoute"),
            arguments.indices.contains(index + 1) {
             switch arguments[index + 1] {
             case "notificationSettings":
