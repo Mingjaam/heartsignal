@@ -7,11 +7,83 @@
 
 import SwiftUI
 
+private enum ConnectStep {
+    case step1
+    case step2Code
+    case step2Nearby
+    case step3(isNearby: Bool, partnerCode: String?)
+    case step4(success: Bool)
+    case step5
+}
+
 struct ContentView: View {
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @AppStorage("termsAccepted") private var termsAccepted = false
+    @AppStorage("isConnected") private var isConnected = false
+    @State private var connectStep: ConnectStep = .step1
     @State private var selectedTab: TabItem = .home
     @State private var showSendSheet  = false
+    @StateObject private var connectivityService = ConnectivityService()
 
     var body: some View {
+        if !isLoggedIn {
+            LoginView(onTestMode: { isLoggedIn = true })
+        } else if !termsAccepted {
+            TermsAgreementView(onNext: { termsAccepted = true })
+        } else if !isConnected {
+            switch connectStep {
+            case .step1:
+                ConnectStep1View(
+                    onStart: { connectStep = .step2Code },
+                    onNearby: { connectStep = .step2Nearby }
+                )
+            case .step2Code:
+                ConnectStep2View(
+                    myCode: connectivityService.myCode,
+                    onBack: { connectStep = .step1 },
+                    onNext: { code in
+                        connectStep = .step3(isNearby: false, partnerCode: code)
+                    }
+                )
+            case .step2Nearby:
+                ConnectStep2NearbyView(
+                    onBack: {
+                        connectivityService.stopConnecting()
+                        connectStep = .step1
+                    },
+                    onPeerFound: {
+                        connectStep = .step3(isNearby: true, partnerCode: nil)
+                    }
+                )
+                .environmentObject(connectivityService)
+            case .step3(let isNearby, let partnerCode):
+                ConnectStep3View(
+                    isNearby: isNearby,
+                    partnerCode: partnerCode,
+                    onBack: {
+                        connectivityService.stopConnecting()
+                        connectStep = isNearby ? .step2Nearby : .step2Code
+                    },
+                    onSuccess: { connectStep = .step4(success: true) },
+                    onFailure: { connectStep = .step4(success: false) }
+                )
+                .environmentObject(connectivityService)
+            case .step4(let success):
+                ConnectStep4View(
+                    success: success,
+                    onNext: { connectStep = .step5 },
+                    onRetry: { connectStep = .step1 },
+                    onTestSuccess: { connectStep = .step4(success: true) }
+                )
+            case .step5:
+                ConnectStep5View(onStart: { isConnected = true })
+            }
+        } else {
+            mainApp
+        }
+    }
+
+    private var mainApp: some View {
         ZStack(alignment: .bottom) {
             // 상단 safe area 흰색 고정
             Color.white.ignoresSafeArea(edges: .top)

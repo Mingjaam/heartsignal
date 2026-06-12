@@ -9,6 +9,8 @@ class PhoneConnectivityManager: NSObject, ObservableObject {
     @Published var isWatchReachable: Bool = false
     @Published var watchHeartRate: Double = 0
     @Published var partnerHeartRate: Double = 0
+    @Published var averageHeartRate: Double = 0
+    @Published var yesterdayAverageHeartRate: Double = 0
 
     private let healthStore = HKHealthStore()
 
@@ -34,10 +36,12 @@ class PhoneConnectivityManager: NSObject, ObservableObject {
             let observer = HKObserverQuery(sampleType: heartRateType, predicate: nil) { [weak self] _, _, error in
                 guard error == nil else { return }
                 self?.fetchLatestHeartRate()
+                self?.fetchAverageHeartRates()
             }
             self.healthStore.execute(observer)
             // 앱 시작 시 최신값 즉시 로드
             self.fetchLatestHeartRate()
+            self.fetchAverageHeartRates()
         }
     }
 
@@ -52,6 +56,38 @@ class PhoneConnectivityManager: NSObject, ObservableObject {
             }
         }
         healthStore.execute(query)
+    }
+
+    private func fetchAverageHeartRates() {
+        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+        let calendar = Calendar.current
+        let now = Date()
+        let startOfToday = calendar.startOfDay(for: now)
+        let startOfYesterday = calendar.date(byAdding: .day, value: -1, to: startOfToday)!
+
+        // 오늘 평균
+        let todayPredicate = HKQuery.predicateForSamples(withStart: startOfToday, end: now)
+        let todayQuery = HKStatisticsQuery(
+            quantityType: heartRateType,
+            quantitySamplePredicate: todayPredicate,
+            options: .discreteAverage
+        ) { [weak self] _, result, _ in
+            guard let avg = result?.averageQuantity()?.doubleValue(for: HKUnit(from: "count/min")) else { return }
+            DispatchQueue.main.async { self?.averageHeartRate = avg }
+        }
+        healthStore.execute(todayQuery)
+
+        // 어제 평균
+        let yesterdayPredicate = HKQuery.predicateForSamples(withStart: startOfYesterday, end: startOfToday)
+        let yesterdayQuery = HKStatisticsQuery(
+            quantityType: heartRateType,
+            quantitySamplePredicate: yesterdayPredicate,
+            options: .discreteAverage
+        ) { [weak self] _, result, _ in
+            guard let avg = result?.averageQuantity()?.doubleValue(for: HKUnit(from: "count/min")) else { return }
+            DispatchQueue.main.async { self?.yesterdayAverageHeartRate = avg }
+        }
+        healthStore.execute(yesterdayQuery)
     }
 
     // 상대 심박수를 워치에 전달

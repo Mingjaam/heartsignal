@@ -8,6 +8,28 @@ struct HomeView: View {
 
     private var isWatchConnected: Bool { connectivity.isWatchReachable }
 
+    // MARK: - 실측 심박수 계산값
+
+    private var myBpm: String {
+        connectivity.watchHeartRate > 0 ? "\(Int(connectivity.watchHeartRate))" : "--"
+    }
+
+    private var myChange: String {
+        let current = connectivity.watchHeartRate
+        let yesterday = connectivity.yesterdayAverageHeartRate
+        guard current > 0, yesterday > 0 else { return "--" }
+        let pct = ((current - yesterday) / yesterday) * 100
+        return pct >= 0 ? "+\(Int(pct))%" : "\(Int(pct))%"
+    }
+
+    private var myAvg: String {
+        connectivity.averageHeartRate > 0 ? "\(Int(connectivity.averageHeartRate))" : "--"
+    }
+
+    private var partnerBpm: String {
+        connectivity.partnerHeartRate > 0 ? "\(Int(connectivity.partnerHeartRate))" : "--"
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             navigationBar
@@ -79,12 +101,12 @@ struct HomeView: View {
 
                 // 글래스모피즘 카드 (343 fixed, 192 height)
                 HStack(spacing: 0) {
-                    heartRateColumn(name: "나", bpm: "123", change: "+12%", avg: "123")
+                    heartRateColumn(name: "나", bpm: myBpm, change: myChange, avg: myAvg)
                     Rectangle()
                         .fill(Color.white.opacity(0.35))
                         .frame(width: 1)
                         .padding(.vertical, 14)
-                    heartRateColumn(name: "상대", bpm: "123", change: "+12%", avg: "123")
+                    heartRateColumn(name: "상대", bpm: partnerBpm, change: "--", avg: "--")
                 }
                 .frame(width: 343, height: 192)
                 .background(Color.white.opacity(0.18))

@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>상대방과 근거리 무선 연결을 통해 연동하기 위해 로컬 네트워크 접근이 필요합니다.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_heartsignal._tcp</string>
+		<string>_heartsignal._udp</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>상대방과의 거리를 계산하기 위해 위치 정보가 필요합니다.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>심박수 데이터를 읽어 파트너와 공유하기 위해 건강 데이터 접근이 필요합니다.</string>
 	<key>NSHealthUpdateUsageDescription</key>

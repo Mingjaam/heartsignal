@@ -11,7 +11,7 @@ struct PrimaryButton: View {
         } label: {
             Text(title)
                 .font(.body18SB)
-                .foregroundColor(.white)
+                .foregroundColor(isEnabled ? .white : Color.gray900)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 15)
                 .background(isEnabled ? Color.main700 : Color.gray700)

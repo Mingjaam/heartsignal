@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct MyPageView: View {
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @AppStorage("termsAccepted") private var termsAccepted = false
+    @AppStorage("isConnected") private var isConnected = false
+
     var body: some View {
         VStack(spacing: 0) {
             AppNavBar {
@@ -101,8 +105,13 @@ struct MyPageView: View {
     private var settingsSection: some View {
         VStack(spacing: 0) {
             sectionHeader("설정")
-            ListItem(title: "알림설정", icon: .bellOff,  style: .navigate) {}
-            ListItem(title: "설정",     icon: .setting,  style: .navigate) {}
+            ListItem(title: "알림설정", icon: .bellOff, style: .navigate) {}
+            ListItem(title: "설정",     icon: .setting, style: .navigate) {}
+            ListItem(title: "로그아웃", icon: .close,   style: .navigate) {
+                isConnected = false
+                termsAccepted = false
+                isLoggedIn = false
+            }
         }
     }
 

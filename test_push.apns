@@ -1,0 +1,11 @@
+{
+    "Simulator Target Bundle": "com.mingjam.heartsignal",
+    "aps": {
+        "alert": {
+            "title": "지금 반응이 온 것 같아요 💓",
+            "body": "상대방의 심박수가 상승했어요 +12 bpm"
+        },
+        "sound": "default",
+        "badge": 1
+    }
+}
