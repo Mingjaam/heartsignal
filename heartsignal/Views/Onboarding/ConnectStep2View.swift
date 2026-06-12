@@ -12,69 +12,87 @@ struct ConnectStep2View: View {
         VStack(spacing: 0) {
             navBar
 
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    Text("2 / 5 단계")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.gray900)
-                        .padding(.top, 36)
-                        .padding(.bottom, 12)
+            GeometryReader { proxy in
+                let width = proxy.size.width
+                let scale = width / 375
 
-                    Text("상대방의 코드를\n입력해주세요.")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(Color.brown700)
+                ZStack(alignment: .top) {
+                    stepText(current: "2")
+                        .position(x: width / 2, y: 73 * scale)
+
+                    Text("휴대폰을 서로 가까이 하거나\n상대방의 코드를 입력해주세요.")
+                        .font(.system(size: 24, weight: .regular))
+                        .foregroundColor(Color(hex: "111111"))
+                        .lineSpacing(0)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
+                        .frame(width: 288 * scale, height: 68 * scale)
+                        .position(x: width / 2, y: 126 * scale)
 
                     Image("img_connect_ecg")
                         .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
+                        .frame(width: width, height: 83 * scale)
+                        .position(x: width / 2, y: 239 * scale)
 
-                    // 내 코드
-                    HStack(spacing: 6) {
-                        Text("내 코드")
-                            .font(.system(size: 14))
-                            .foregroundColor(Color.gray900)
-                        Text(myCode)
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(Color.brown700)
-                        Button {
-                            UIPasteboard.general.string = myCode
-                        } label: {
-                            Image(systemName: "doc.on.doc")
-                                .font(.system(size: 13))
-                                .foregroundColor(Color.gray900)
+                    VStack(spacing: 17) {
+                        HStack(spacing: 6) {
+                            Text("내 코드")
+                                .font(.system(size: 18, weight: .regular))
+                                .foregroundColor(Color.gray800)
+                            Text(myCode)
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(Color(hex: "111111"))
+                            Button {
+                                UIPasteboard.general.string = myCode
+                            } label: {
+                                Image(systemName: "doc.on.doc.fill")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(Color.gray800)
+                            }
                         }
-                    }
-                    .padding(.bottom, 16)
 
-                    // 코드 입력 필드
-                    TextField("상대의 코드를 입력해주세요.", text: $partnerCode)
-                        .font(.system(size: 16))
-                        .foregroundColor(Color.brown700)
-                        .keyboardType(.numberPad)
+                        TextField("상대의 코드를 입력해주세요.", text: $partnerCode)
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(Color(hex: "111111"))
+                            .keyboardType(.numberPad)
+                            .padding(.horizontal, 12)
+                            .frame(height: 55)
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.brown700, lineWidth: 1)
+                            )
+                    }
+                    .frame(width: 343 * scale, height: 96 * scale)
+                    .position(x: width / 2, y: 361 * scale)
+
+                    VStack {
+                        Spacer()
+                        PrimaryButton(title: "다음", isEnabled: !partnerCode.isEmpty) {
+                            onNext(partnerCode)
+                        }
                         .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray700, lineWidth: 1)
-                        )
-                        .padding(.horizontal, 24)
+                        .padding(.bottom, 23)
+                    }
                 }
             }
-
-            PrimaryButton(title: "다음", isEnabled: !partnerCode.isEmpty) {
-                onNext(partnerCode)
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 12)
-            .padding(.bottom, 44)
         }
         .background(Color.white.ignoresSafeArea())
+    }
+
+    private func stepText(current: String) -> some View {
+        HStack(spacing: 4) {
+            Text(current)
+                .foregroundColor(Color(hex: "111111"))
+            Text("/")
+                .foregroundColor(Color.gray700)
+            Text("5")
+                .foregroundColor(Color.gray700)
+            Text("단계")
+                .foregroundColor(Color.gray700)
+        }
+        .font(.body14R)
+        .frame(height: 20)
     }
 
     private var navBar: some View {

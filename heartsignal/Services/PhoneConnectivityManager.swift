@@ -16,6 +16,16 @@ class PhoneConnectivityManager: NSObject, ObservableObject {
 
     private override init() {
         super.init()
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-figmaPreview") {
+            isWatchReachable = true
+            watchHeartRate = 123
+            partnerHeartRate = 123
+            averageHeartRate = 123
+            yesterdayAverageHeartRate = 109
+            return
+        }
+#endif
         guard WCSession.isSupported() else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()

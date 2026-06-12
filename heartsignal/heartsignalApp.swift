@@ -13,6 +13,11 @@ struct heartsignalApp: App {
     @StateObject private var connectivity = PhoneConnectivityManager.shared
 
     init() {
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-figmaPreview") {
+            return
+        }
+#endif
         requestNotificationPermission()
     }
 

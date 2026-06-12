@@ -7,60 +7,68 @@ struct ConnectStep4View: View {
     let onTestSuccess: () -> Void   // 테스트: 실패 이미지 3번 탭 → 성공화면
 
     @State private var testTapCount = 0
-    private let circleSize: CGFloat = 160
+    private let circleSize: CGFloat = 136
 
     var body: some View {
         VStack(spacing: 0) {
             navBar
 
-            VStack(spacing: 0) {
-                Text("4 / 5 단계")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color.gray900)
-                    .padding(.top, 36)
-                    .padding(.bottom, 12)
+            GeometryReader { proxy in
+                let width = proxy.size.width
+                let scale = width / 375
 
-                if success {
-                    Text("연동 완료!")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(Color.brown700)
-                } else {
-                    Text("연동 실패\n다시 시도해보세요")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(Color.brown700)
-                        .multilineTextAlignment(.center)
+                ZStack(alignment: .top) {
+                    stepText(current: "4")
+                        .position(x: width / 2, y: 73 * scale)
 
-                    Text("더 가까이 휴대폰을 대거나\n코드를 한번 더 확인해주세요.")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color.gray900)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 8)
-                }
+                    if success {
+                        Text("연동 완료!")
+                            .font(.system(size: 24, weight: .regular))
+                            .foregroundColor(Color(hex: "111111"))
+                            .frame(height: 34 * scale)
+                            .position(x: width / 2, y: 109 * scale)
+                    } else {
+                        VStack(spacing: 8) {
+                            Text("연동 실패\n다시 시도해보세요")
+                                .font(.system(size: 24, weight: .regular))
+                                .foregroundColor(Color(hex: "111111"))
+                                .lineSpacing(0)
+                                .multilineTextAlignment(.center)
+                                .frame(width: 183 * scale, height: 68 * scale)
 
-                Spacer()
-
-                Image(success ? "img_connect_success" : "img_connect_fail")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: circleSize, height: circleSize)
-                    .onTapGesture {
-                        guard !success else { return }
-                        testTapCount += 1
-                        if testTapCount >= 3 {
-                            onTestSuccess()
+                            Text("더 가까이 휴대폰을 대거나\n코드를 한번 더 확인해주세요.")
+                                .font(.system(size: 16, weight: .regular))
+                                .foregroundColor(Color.gray900)
+                                .lineSpacing(0)
+                                .multilineTextAlignment(.center)
+                                .frame(width: 183 * scale, height: 44 * scale)
                         }
+                        .position(x: width / 2, y: 152 * scale)
                     }
 
-                Spacer()
-            }
+                    Image(success ? "img_connect_success" : "img_connect_fail")
+                        .resizable()
+                        .frame(width: circleSize * scale, height: circleSize * scale)
+                        .position(x: width / 2, y: 289 * scale)
+                        .onTapGesture {
+                            guard !success else { return }
+                            testTapCount += 1
+                            if testTapCount >= 3 {
+                                onTestSuccess()
+                            }
+                        }
 
-            if !success {
-                PrimaryButton(title: "다시 시도하기", isEnabled: true) {
-                    onRetry()
+                    if !success {
+                        VStack {
+                            Spacer()
+                            PrimaryButton(title: "다시 시도하기", isEnabled: true) {
+                                onRetry()
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 23)
+                        }
+                    }
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 12)
-                .padding(.bottom, 44)
             }
         }
         .background(Color.white.ignoresSafeArea())
@@ -69,6 +77,21 @@ struct ConnectStep4View: View {
             try? await Task.sleep(for: .seconds(2.0))
             onNext()
         }
+    }
+
+    private func stepText(current: String) -> some View {
+        HStack(spacing: 4) {
+            Text(current)
+                .foregroundColor(Color(hex: "111111"))
+            Text("/")
+                .foregroundColor(Color.gray700)
+            Text("5")
+                .foregroundColor(Color.gray700)
+            Text("단계")
+                .foregroundColor(Color.gray700)
+        }
+        .font(.body14R)
+        .frame(height: 20)
     }
 
     private var navBar: some View {

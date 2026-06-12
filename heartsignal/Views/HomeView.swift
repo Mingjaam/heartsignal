@@ -30,6 +30,14 @@ struct HomeView: View {
         connectivity.partnerHeartRate > 0 ? "\(Int(connectivity.partnerHeartRate))" : "--"
     }
 
+    private var partnerChange: String {
+        connectivity.partnerHeartRate > 0 ? "+12%" : "--"
+    }
+
+    private var partnerAvg: String {
+        connectivity.partnerHeartRate > 0 ? "123" : "--"
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             navigationBar
@@ -106,7 +114,7 @@ struct HomeView: View {
                         .fill(Color.white.opacity(0.35))
                         .frame(width: 1)
                         .padding(.vertical, 14)
-                    heartRateColumn(name: "상대", bpm: partnerBpm, change: "--", avg: "--")
+                    heartRateColumn(name: "상대", bpm: partnerBpm, change: partnerChange, avg: partnerAvg)
                 }
                 .frame(width: 343, height: 192)
                 .background(Color.white.opacity(0.18))
@@ -133,28 +141,38 @@ struct HomeView: View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Text(name)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Color.brown700)
                 HSIconView(name: .heart, color: Color(hex: "FF3B5C"), size: 14)
             }
 
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(bpm)
-                    .font(.system(size: 42, weight: .semibold))
+                    .font(.system(size: 50, weight: .semibold))
                     .foregroundColor(Color.brown700)
                 Text("bpm")
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(Color.main700)
-                    .padding(.bottom, 5)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(Color(hex: "FF006F"))
+                    .padding(.bottom, 10)
             }
 
-            Text("어제보다 \(change)")
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(Color(hex: "FF3B30"))
+            HStack(spacing: 2) {
+                Text("어제보다")
+                    .foregroundColor(Color.gray900)
+                Text(change)
+                    .foregroundColor(Color(hex: "FF0037"))
+            }
+            .font(.system(size: 12, weight: .regular))
 
-            Text("평균 \(avg) bpm")
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(Color.brown700.opacity(0.6))
+            HStack(alignment: .lastTextBaseline, spacing: 2) {
+                Text("평균")
+                    .font(.system(size: 12, weight: .regular))
+                Text(avg)
+                    .font(.system(size: 16, weight: .semibold))
+                Text("bpm")
+                    .font(.system(size: 12, weight: .regular))
+            }
+            .foregroundColor(Color.gray900)
         }
         .frame(maxWidth: .infinity)
     }
@@ -220,20 +238,23 @@ struct StatusCardRow: View {
     var body: some View {
         HStack {
             Text(card.text)
-                .font(card.isActive ? .body14SB : .body14R)
+                .font(.system(size: 16, weight: card.isActive ? .semibold : .regular))
                 .foregroundColor(Color.brown700)
             Text(card.emoji)
-                .font(.system(size: 14))
+                .font(.system(size: card.isActive ? 20 : 18))
             Spacer()
-            HSIconView(name: .write, color: Color.gray800)
+            HSIconView(
+                name: card.isActive ? .sendOn : .sendOff,
+                color: card.isActive ? Color.main700 : Color.gray800
+            )
         }
-        .padding(.vertical, 18)
         .padding(.horizontal, 12)
+        .frame(height: 64)
         .background(Color.white)
-        .cornerRadius(12)
+        .cornerRadius(10)
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(card.isActive ? Color.main700 : Color(hex: "E0E0E0"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(card.isActive ? Color.main700 : Color.gray700, lineWidth: 1)
         )
     }
 }

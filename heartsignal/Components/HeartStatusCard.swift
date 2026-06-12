@@ -10,10 +10,10 @@ struct HeartCardSlide {
     let emoji: String
 
     static let slides: [HeartCardSlide] = [
-        .init(imageName: "img_heart_card_default",
-              statusTitle: "둘 다 심박수 상승 중!",
-              emoji: "💓"),
         .init(imageName: "img_heart_card_rise",
+              statusTitle: "둘 다 심박수 상승 중!",
+              emoji: "💞"),
+        .init(imageName: "img_heart_card_default",
               statusTitle: "심박수가 올라가고 있어!",
               emoji: "❤️‍🔥"),
         .init(imageName: "img_heart_card_night",
@@ -38,6 +38,11 @@ struct HeartStatusCardSlider: View {
 
     /// 내 위치와 부산 사이의 거리 문자열
     private var distanceText: String {
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-figmaPreview") {
+            return "90km"
+        }
+#endif
         guard let userLoc = locationManager.location else { return "--km" }
         let meters = userLoc.distance(from: partnerLocation)
         let km = meters / 1000.0
@@ -144,6 +149,12 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     override init() {
         super.init()
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-figmaPreview") {
+            location = CLLocation(latitude: 35.8714, longitude: 128.6014)
+            return
+        }
+#endif
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyKilometer
         handleAuthorization()

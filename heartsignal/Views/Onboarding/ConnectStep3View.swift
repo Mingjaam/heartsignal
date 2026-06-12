@@ -11,37 +11,38 @@ struct ConnectStep3View: View {
     @State private var progress: CGFloat = 0
 
     private let animationDuration: Double = 4.0
-    private let circleSize: CGFloat = 160
+    private let circleSize: CGFloat = 136
 
     var body: some View {
         VStack(spacing: 0) {
             navBar
 
-            VStack(spacing: 0) {
-                Text("3 / 5 단계")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color.gray900)
-                    .padding(.top, 36)
-                    .padding(.bottom, 12)
+            GeometryReader { proxy in
+                let width = proxy.size.width
+                let scale = width / 375
 
-                Text("연동 확인중이에요")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(Color.brown700)
+                ZStack(alignment: .top) {
+                    stepText(current: "3")
+                        .position(x: width / 2, y: 73 * scale)
 
-                Spacer()
+                    Text("연동 확인중이에요")
+                        .font(.system(size: 24, weight: .regular))
+                        .foregroundColor(Color(hex: "111111"))
+                        .frame(height: 34 * scale)
+                        .position(x: width / 2, y: 109 * scale)
 
-                ZStack {
-                    Circle()
-                        .stroke(Color.gray700, lineWidth: 18)
-                    Circle()
-                        .trim(from: 0, to: progress)
-                        .stroke(Color.main700, style: StrokeStyle(lineWidth: 18, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                        .animation(.linear(duration: animationDuration), value: progress)
+                    ZStack {
+                        Circle()
+                            .stroke(Color.gray700, lineWidth: 13)
+                        Circle()
+                            .trim(from: 0, to: progress)
+                            .stroke(Color.main700, style: StrokeStyle(lineWidth: 13, lineCap: .round))
+                            .rotationEffect(.degrees(-90))
+                            .animation(.linear(duration: animationDuration), value: progress)
+                    }
+                    .frame(width: circleSize * scale, height: circleSize * scale)
+                    .position(x: width / 2, y: 289 * scale)
                 }
-                .frame(width: circleSize, height: circleSize)
-
-                Spacer()
             }
         }
         .background(Color.white.ignoresSafeArea())
@@ -65,6 +66,21 @@ struct ConnectStep3View: View {
                 onFailure()
             }
         }
+    }
+
+    private func stepText(current: String) -> some View {
+        HStack(spacing: 4) {
+            Text(current)
+                .foregroundColor(Color(hex: "111111"))
+            Text("/")
+                .foregroundColor(Color.gray700)
+            Text("5")
+                .foregroundColor(Color.gray700)
+            Text("단계")
+                .foregroundColor(Color.gray700)
+        }
+        .font(.body14R)
+        .frame(height: 20)
     }
 
     private var navBar: some View {

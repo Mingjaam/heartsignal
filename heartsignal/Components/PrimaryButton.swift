@@ -11,11 +11,11 @@ struct PrimaryButton: View {
         } label: {
             Text(title)
                 .font(.body18SB)
-                .foregroundColor(isEnabled ? .white : Color.gray900)
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
+                .frame(height: 56)
                 .background(isEnabled ? Color.main700 : Color.gray700)
-                .cornerRadius(12)
+                .cornerRadius(10)
         }
         .disabled(!isEnabled)
     }

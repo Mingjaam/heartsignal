@@ -91,7 +91,7 @@ struct TabBar: View {
                     size: 24
                 )
                 Text(tab.title)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: 14, weight: active ? .semibold : .regular))
                     .foregroundColor(active ? Color.main700 : Color.brown700)
             }
             .frame(maxWidth: .infinity)

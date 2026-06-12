@@ -8,61 +8,51 @@ struct ConnectStep1View: View {
         VStack(spacing: 0) {
             AppNavBar()
 
-            VStack(spacing: 0) {
-                // 단계 표시
-                Text("1 / 5 단계")
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(Color.gray900)
-                    .padding(.top, 36)
-                    .padding(.bottom, 12)
+            GeometryReader { proxy in
+                let width = proxy.size.width
+                let scale = width / 375
 
-                // 타이틀
-                Text("심박수로 알아보는\n우리사이")
-                    .font(.system(size: 26, weight: .bold))
-                    .foregroundColor(Color.brown700)
-                    .multilineTextAlignment(.center)
+                ZStack(alignment: .top) {
+                    stepText(current: "1")
+                        .position(x: width / 2, y: 73 * scale)
 
-                Spacer()
+                    Text("심박수로 알아보는\n우리사이")
+                        .font(.system(size: 24, weight: .regular))
+                        .foregroundColor(Color(hex: "111111"))
+                        .lineSpacing(0)
+                        .multilineTextAlignment(.center)
+                        .frame(width: 172 * scale, height: 68 * scale)
+                        .position(x: width / 2, y: 126 * scale)
 
-                // 중앙 워치 이미지
-                Image("img_connect_watch")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
+                    Image("img_connect_watch")
+                        .resizable()
+                        .frame(width: width, height: 266 * scale)
+                        .position(x: width / 2, y: 302 * scale)
 
-                Spacer()
-
-                // 하단 버튼 영역
-                VStack(spacing: 14) {
                     PrimaryButton(title: "시작하기", isEnabled: true) {
                         onStart()
                     }
-
-                    VStack(spacing: 10) {
-                        Text("상대와 가까이 있다면")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color.gray900)
-
-                        Button { onNearby() } label: {
-                            Text("연동하기")
-                                .font(.body18SB)
-                                .foregroundColor(Color.main700)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 15)
-                                .background(Color.white)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.main700, lineWidth: 1.5)
-                                )
-                        }
-                    }
+                    .padding(.horizontal, 16)
+                    .position(x: width / 2, y: 633 * scale)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 44)
             }
         }
         .background(Color.white.ignoresSafeArea())
+    }
+
+    private func stepText(current: String) -> some View {
+        HStack(spacing: 4) {
+            Text(current)
+                .foregroundColor(Color(hex: "434343"))
+            Text("/")
+                .foregroundColor(Color(hex: "A6A6A6"))
+            Text("5")
+                .foregroundColor(Color(hex: "A6A6A6"))
+            Text("단계")
+                .foregroundColor(Color(hex: "A6A6A6"))
+        }
+        .font(.body14R)
+        .frame(height: 20)
     }
 }
 

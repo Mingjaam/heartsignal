@@ -4,18 +4,20 @@ struct LoginView: View {
     var onTestMode: (() -> Void)? = nil
 
     var body: some View {
-        ZStack {
+        GeometryReader { proxy in
+            let width = proxy.size.width
+            let scale = width / 375
+
+            ZStack(alignment: .top) {
             Color.white.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                Spacer()
-
-                // 타이틀
                 VStack(spacing: 10) {
                     Text("심박수로 알아보는\n우리사이")
-                        .font(.system(size: 26, weight: .bold))
-                        .foregroundColor(Color.brown700)
+                        .font(.system(size: 24, weight: .regular))
+                        .foregroundColor(Color(hex: "111111"))
+                        .lineSpacing(0)
                         .multilineTextAlignment(.center)
+                        .frame(width: 172 * scale, height: 68 * scale)
 
                     HStack(spacing: 5) {
                         Image("ic_appmain")
@@ -28,18 +30,13 @@ struct LoginView: View {
                             .foregroundColor(Color.brown700)
                     }
                 }
+                .position(x: width / 2, y: 190 * scale)
 
-                Spacer()
-
-                // 워치 + 심박선 이미지 (풀 width, 가로 패딩 없음)
                 Image("img_login_watch")
                     .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
+                    .frame(width: width, height: 266 * scale)
+                    .position(x: width / 2, y: 369 * scale)
 
-                Spacer()
-
-                // 하단 버튼
                 VStack(spacing: 14) {
                     Button {
                         // TODO: Apple Sign In
@@ -53,9 +50,9 @@ struct LoginView: View {
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 17)
+                        .frame(height: 56)
                         .background(Color(hex: "1C1C1E"))
-                        .cornerRadius(14)
+                        .cornerRadius(10)
                     }
 
                     if let onTestMode {
@@ -69,8 +66,8 @@ struct LoginView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 44)
+                .padding(.horizontal, 16)
+                .position(x: width / 2, y: 683 * scale)
             }
         }
     }
